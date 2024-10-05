@@ -1,8 +1,7 @@
 package com.project.pastebinsimple.feature.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
 import com.project.pastebinsimple.exception.StorageException;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -79,4 +79,20 @@ public class StorageService {
     public void deleteFile(String fileName) {
         s3Client.deleteObject(bucket, fileName);
     }
+
+    public void deleteFiles(List<String> fileNames) {
+        List<DeleteObjectsRequest.KeyVersion> keysToDelete = fileNames.stream()
+                .map(DeleteObjectsRequest.KeyVersion::new)
+                .toList();
+
+        DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucket)
+                .withKeys(keysToDelete);
+
+        try {
+            s3Client.deleteObjects(deleteObjectsRequest);
+        } catch (MultiObjectDeleteException e) {
+            throw new StorageException("Failed to delete", e);
+        }
+    }
+
 }

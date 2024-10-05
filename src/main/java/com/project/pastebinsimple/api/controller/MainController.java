@@ -42,11 +42,14 @@ public class MainController {
 
     @PostMapping("/delete-paste")
     public String deletePaste(@RequestParam String url, @AuthenticationPrincipal OAuth2User principal) {
-
-        System.out.println();
-
         pasteService.deletePaste(url, principal);
         return "redirect:/api/main/home";
+    }
+
+    @PostMapping("delete-user")
+    public String deleteUser(@AuthenticationPrincipal OAuth2User principal) {
+        userService.deleteUser(principal);
+        return "redirect:/login";
     }
 
 }

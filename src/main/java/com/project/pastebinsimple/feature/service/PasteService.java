@@ -130,6 +130,14 @@ public class PasteService {
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
+    public void deleteCache(List<Long> ids) {
+        for (Long id : ids) {
+            String hash = getHashFromPasteId(id);
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(hash)))
+                redisTemplate.delete(hash);
+        }
+    }
+
     private String extractLastPathSegmentFromUrl(String url) {
         int index = url.lastIndexOf('/');
         return (index != -1) ? url.substring(index + 1) : url;
