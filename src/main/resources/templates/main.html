@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Main</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2 {
+      color: #333;
+      margin: 10px 0;
+    }
+
+    .user-info {
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #e9ecef;
+      border-radius: 5px;
+    }
+
+    .paste-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f8f9fa;
+    }
+
+    input[type="text"],
+    input[type="datetime-local"],
+    textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin: 5px 0;
+    }
+
+    button {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .delete-button {
+      background-color: #dc3545;
+    }
+
+    .delete-button:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+  <h1>Main</h1>
+
+  <!-- USER INFO -->
+  <div th:if="${user != null}" class="user-info">
+    <p><strong>Username:</strong> <span th:text="${user.getUsername()}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${user.getEmail()}"></span></p>
+  </div>
+
+  <!-- PASTE LINKS -->
+  <h2>Your Pastes</h2>
+  <div th:each="paste: ${pastes}" class="paste-link" style="display: flex; align-items: center;">
+    <a th:href="${paste.url}" th:text="${paste.url}" style="flex-grow: 1;"></a>
+
+    <!-- DELETE LINK -->
+    <form method="POST" th:action="@{/api/main/delete-paste}" style="margin-left: 10px;">
+      <input type="hidden" th:value="${paste.url}" name="url" />
+      <button type="submit" class="delete-button">Delete</button>
+    </form>
+
+    <!-- SHARE BUTTON -->
+    <button class="share-button" onclick="shareLink('https://example.com/${paste.id}')">Поделиться</button>
+  </div>
+
+  <script>
+    function shareLink(url) {
+      if (navigator.share) {
+        navigator.share({
+          title: 'Check out this paste!',
+          url: url
+        })
+                .then(() => console.log('Share successful'))
+                .catch(error => console.error('Error sharing:', error));
+      } else {
+        alert('Sorry, your platform does not support link sharing.');
+      }
+    }
+  </script>
+
+
+  <!-- CREATE PASTE -->
+  <h2>Create Paste</h2>
+  <form th:method="DELETE" th:action="@{/api/main/create-paste}" th:object="${pasteRequest}">
+    <textarea id="text" th:field="*{text}" rows="4" placeholder="Enter your text here..."></textarea>
+    <input type="datetime-local" id="datetime" th:field="*{date}" required />
+    <button type="submit">Create</button>
+  </form>
+</div>
+</body>
+
+</html>
